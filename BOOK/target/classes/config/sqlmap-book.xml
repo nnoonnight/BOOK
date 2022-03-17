@@ -1,0 +1,42 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org/DTD Mapper 3.0//EN"
+"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="bookVO">
+	<select id="list" resultType="bookVO">
+		SELECT * FROM BOOK
+	</select>
+	<select id="detail" parameterType="int" resultType="bookVO">
+		SELECT * FROM BOOK WHERE NUM = #{num}
+	</select>
+	<select id="search" parameterType="searchCommand" resultType="bookVO">
+		<if test='searchOption.equals("title")'>
+		SELECT * FROM BOOK WHERE TITLE LIKE '%'||#{searchWord}||'%'
+		</if>
+		
+		<!--  select * from book where 옵션(작가/출판사) like 키워드(홍길동/출판사) -->
+		<if test="searchOption == 'author'">
+		SELECT * FROM BOOK WHERE AUTHOR LIKE '%'||#{searchWord}||'%'
+		</if>
+		<if test="searchOption == 'publisher'">
+		SELECT * FROM BOOK WHERE PUBLISHER LIKE '%'||#{searchWord}||'%'
+		</if>
+	</select>
+	
+	<!-- isbn 중복 확인 -->
+	<select id="isbnCheck" parameterType="bookVO" resultType="int">
+		SELECT COUNT(ISBN) FROM BOOK WHERE ISBN LIKE #{isbn}
+	</select>
+	
+	<insert id="insert" parameterType="bookVO">
+		INSERT INTO BOOK
+		(num, name, isbn, title, author, publisher, price, intro)
+		VALUES
+		(BOOK_SEQ.nextval, #{name}, #{isbn}, #{title}, #{author}, #{publisher}, #{price}, #{intro})
+	</insert>
+	
+	<delete id="delete" parameterType="bookVO">
+		DELETE FROM BOOK WHERE num = #{num}
+		AND title = #{title}	
+	</delete>
+</mapper>
